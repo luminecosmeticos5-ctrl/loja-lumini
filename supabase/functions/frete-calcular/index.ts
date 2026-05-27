@@ -189,16 +189,23 @@ serve(async (req) => {
     // ============================================
     // 6. CHAMAR API DO MELHOR ENVIO
     // ============================================
-    // URL CORRETA com www
+    const isSandbox = config.ambiente === "sandbox";
+    const melhorEnvioBaseUrl = isSandbox
+      ? "https://sandbox.melhorenvio.com.br"
+      : "https://www.melhorenvio.com.br";
+
+    console.log("AMBIENTE:", isSandbox ? "sandbox" : "production");
+    console.log("BASE URL:", melhorEnvioBaseUrl);
+
     const melhorEnvioResponse = await fetch(
-      "https://www.melhorenvio.com.br/api/v2/me/shipment/calculate",
+      `${melhorEnvioBaseUrl}/api/v2/me/shipment/calculate`,
       {
         method: "POST",
         headers: {
           "Accept": "application/json",
           "Authorization": `Bearer ${accessToken}`,
           "Content-Type": "application/json",
-          "User-Agent": "ecommerce-bora-glow/1.0"
+          "User-Agent": "Loja Lumini/1.0"
         },
         body: JSON.stringify(payload)
       }
