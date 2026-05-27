@@ -155,6 +155,8 @@ serve(async (req) => {
       );
     }
 
+    console.log("ORIGIN CEP:", cepOrigem);
+
     // ============================================
     // 5. PREPARAR PAYLOAD PARA MELHOR ENVIO
     // ============================================
@@ -187,6 +189,7 @@ serve(async (req) => {
     // ============================================
     // 6. CHAMAR API DO MELHOR ENVIO
     // ============================================
+    // URL CORRETA com www
     const melhorEnvioResponse = await fetch(
       "https://www.melhorenvio.com.br/api/v2/me/shipment/calculate",
       {
@@ -240,7 +243,7 @@ serve(async (req) => {
     }
 
     // ============================================
-    // 8. FORMATAR OPCÕES DE FRETE
+    // 8. FORMATAR OPÇÕES DE FRETE
     // ============================================
     let fretesData;
     try {
