@@ -239,7 +239,7 @@ export const CategoryCircleIcons = () => {
 
       <div className="max-w-[1600px] mx-auto px-3 md:px-6">
 
-        <div className="flex md:flex-wrap md:justify-center gap-3 md:gap-6 overflow-x-auto md:overflow-visible no-scrollbar pb-3 md:pb-0 px-1">
+        <div className="flex justify-center md:flex-wrap gap-3 md:gap-6 overflow-x-auto md:overflow-visible no-scrollbar pb-3 md:pb-0 px-1">
 
           {safeCategories.map((item: any, i: number) => (
 
