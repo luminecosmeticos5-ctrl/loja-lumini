@@ -75,7 +75,7 @@ serve(async (req) => {
       }
 
       const response = await fetch(
-        "https://www.melhorenvio.com.br/api/v2/me",
+        "https://www.melhorenvio.com.br/api/v2/me/shipment/companies",
         {
           method: "GET",
           headers: {
