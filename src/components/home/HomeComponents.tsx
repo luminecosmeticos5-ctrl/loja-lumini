@@ -50,9 +50,18 @@ export const HeroBanner = () => {
   }, [safeBanners.length]);
 
   return (
-    <section className="w-full bg-brand-background py-3 md:py-6">
-      <div className="max-w-[1600px] mx-auto px-3 md:px-6">
-        <div className="relative w-full h-[260px] sm:h-[300px] md:h-[380px] lg:h-[520px] xl:h-[560px] overflow-hidden group rounded-[22px] md:rounded-[28px] bg-brand-secondary shadow-[0_12px_40px_rgba(0,0,0,0.10)]">
+    <section className="w-full bg-brand-background py-2 md:py-6">
+      <div className="max-w-[1600px] mx-auto px-2 md:px-6">
+        {/* 
+          ========================================
+          TAMANHOS CORRETOS POR BREAKPOINT:
+          Mobile (< 640px): 280px altura
+          Small (640px-767px): 320px altura
+          Tablet (768px-1024px): 400px altura
+          Desktop (1024px+): 500px+ altura
+          ======================================== 
+        */}
+        <div className="relative w-full h-[280px] sm:h-[320px] md:h-[400px] lg:h-[500px] xl:h-[560px] overflow-hidden group rounded-lg md:rounded-2xl bg-brand-secondary shadow-lg md:shadow-xl">
           {safeBanners.map((banner: any, index: number) => (
             <div
               key={banner.id || index}
@@ -63,11 +72,50 @@ export const HeroBanner = () => {
               }`}
             >
               <picture className="w-full h-full">
+                {/* 
+                  ========================================
+                  TAMANHOS DE IMAGEM RECOMENDADOS:
+                  
+                  MOBILE (280px altura):
+                    - Width: 375px (iPhone)
+                    - Height: 280px
+                    - Tamanho arquivo: ~40-60KB
+                    - Formato: JPG otimizado
+                  
+                  TABLET (400px altura):
+                    - Width: 768px
+                    - Height: 400px
+                    - Tamanho arquivo: ~80-120KB
+                    - Formato: JPG otimizado
+                  
+                  DESKTOP (560px altura):
+                    - Width: 1600px
+                    - Height: 560px
+                    - Tamanho arquivo: ~150-200KB
+                    - Formato: JPG otimizado
+                  
+                  CRIAÇÃO NO FIGMA/PHOTOSHOP:
+                  1. Mobile: 375x280px (aspect ratio 1.33:1)
+                  2. Tablet: 768x400px (aspect ratio 1.92:1)
+                  3. Desktop: 1600x560px (aspect ratio 2.86:1)
+                  
+                  DICA: Exporte em WEBP para melhor compressão
+                  ======================================== 
+                */}
                 <source
-                  media="(max-width: 768px)"
+                  media="(max-width: 639px)"
                   srcSet={
                     banner.imagem_mobile ||
                     banner.imagem_desktop ||
+                    banner.imagem
+                  }
+                />
+                <source
+                  media="(min-width: 640px) and (max-width: 1023px)"
+                  srcSet={
+                    banner.imagem_tablet ||
+                    banner.imagem_desktop ||
+                    banner.imagem_mobile ||
                     banner.imagem
                   }
                 />
@@ -88,10 +136,12 @@ export const HeroBanner = () => {
                 />
               </picture>
 
-              <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" />
+              {/* Gradiente para melhorar legibilidade do texto */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
 
+              {/* Conteúdo do Banner */}
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full px-5 md:px-16 lg:px-24">
+                <div className="w-full px-4 sm:px-6 md:px-16 lg:px-24">
                   <div
                     className={`max-w-xl animate-in fade-in slide-in-from-left-8 duration-1000 ${
                       banner.posicao_texto === 'centro'
@@ -101,9 +151,10 @@ export const HeroBanner = () => {
                         : ''
                     }`}
                   >
+                    {/* Título */}
                     {(banner.titulo || banner.title) && (
                       <h1
-                        className="text-2xl sm:text-4xl md:text-6xl leading-tight drop-shadow-lg mb-2 md:mb-4 text-white"
+                        className="text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-tight drop-shadow-lg mb-1.5 md:mb-4 text-white font-bold"
                         style={{
                           fontFamily: 'var(--store-font-heading)',
                           fontWeight: 'var(--store-font-weight-title)',
@@ -116,12 +167,14 @@ export const HeroBanner = () => {
                       </h1>
                     )}
 
+                    {/* Subtítulo */}
                     {(banner.subtitulo || banner.subtitle) && (
-                      <p className="text-white text-xs sm:text-base md:text-xl mb-4 md:mb-8 font-medium max-w-lg drop-shadow-md">
+                      <p className="text-white text-[11px] sm:text-sm md:text-lg mb-3 md:mb-6 font-medium max-w-lg drop-shadow-md line-clamp-2">
                         {banner.subtitulo || banner.subtitle}
                       </p>
                     )}
 
+                    {/* Botão */}
                     {(banner.texto_botao ||
                       banner.textoBotao ||
                       banner.button_text) && (
@@ -132,7 +185,7 @@ export const HeroBanner = () => {
                           banner.button_link ||
                           '/'
                         }
-                        className="inline-block bg-brand-primary hover:opacity-95 text-brand-primary-foreground px-6 md:px-12 py-2.5 md:py-4 transition-all duration-300 rounded-brand-button shadow-2xl text-xs md:text-sm"
+                        className="inline-block bg-brand-primary hover:opacity-95 text-brand-primary-foreground px-5 sm:px-8 md:px-12 py-2 md:py-3.5 transition-all duration-300 rounded-lg md:rounded-brand-button shadow-xl text-[10px] sm:text-xs md:text-sm font-bold"
                         style={{
                           backgroundColor: banner.cor_botao,
                           letterSpacing: 'var(--store-header-spacing)',
@@ -146,7 +199,7 @@ export const HeroBanner = () => {
                         {banner.texto_botao ||
                           banner.textoBotao ||
                           banner.button_text ||
-                          'EXPLORAR AGORA'}
+                          'EXPLORAR'}
                       </Link>
                     )}
                   </div>
@@ -155,22 +208,25 @@ export const HeroBanner = () => {
             </div>
           ))}
 
+          {/* Indicadores de slide */}
           {safeBanners.length > 1 && (
-            <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            <div className="absolute bottom-3 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
               {safeBanners.map((_: any, index: number) => (
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
-                  className={`h-1.5 transition-all rounded-full ${
+                  className={`h-1 transition-all rounded-full ${
                     index === currentSlide
-                      ? 'w-10 md:w-12 bg-white'
-                      : 'w-5 md:w-6 bg-white/45 hover:bg-white/70'
+                      ? 'w-8 md:w-12 bg-white'
+                      : 'w-4 md:w-6 bg-white/40 hover:bg-white/70'
                   }`}
+                  aria-label={`Ir para slide ${index + 1}`}
                 />
               ))}
             </div>
           )}
 
+          {/* Botões de navegação */}
           {safeBanners.length > 1 && (
             <>
               <button
@@ -181,7 +237,8 @@ export const HeroBanner = () => {
                       safeBanners.length
                   )
                 }
-                className="hidden md:flex absolute left-3 md:left-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-xl z-10"
+                className="hidden md:flex absolute left-3 md:left-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full items-center justify-center transition-all opacity-0 md:group-hover:opacity-100 shadow-lg z-10"
+                aria-label="Slide anterior"
               >
                 <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
               </button>
@@ -192,7 +249,8 @@ export const HeroBanner = () => {
                     (prev) => (prev + 1) % safeBanners.length
                   )
                 }
-                className="hidden md:flex absolute right-3 md:right-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-xl z-10"
+                className="hidden md:flex absolute right-3 md:right-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full items-center justify-center transition-all opacity-0 md:group-hover:opacity-100 shadow-lg z-10"
+                aria-label="Próximo slide"
               >
                 <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
               </button>
@@ -287,12 +345,12 @@ export const Benefits = () => {
   ];
 
   return (
-    <section className="border-t border-b border-brand-border py-8 bg-brand-card mb-4">
-      <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 md:divide-x divide-brand-border">
+    <section className="border-t border-b border-brand-border py-6 md:py-8 bg-brand-card mb-4">
+      <div className="max-w-[1400px] mx-auto px-3 md:px-6 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0 md:divide-x divide-brand-border">
         {items.map((b, i) => (
           <div
             key={i}
-            className="flex items-center gap-4 px-4 md:px-10 justify-center md:justify-start"
+            className="flex flex-col sm:flex-row items-center gap-3 px-2 md:px-10 justify-center md:justify-start"
           >
             <div className="w-12 h-12 flex items-center justify-center bg-brand-secondary rounded-full shrink-0 shadow-sm">
               <b.icon
@@ -301,9 +359,9 @@ export const Benefits = () => {
               />
             </div>
 
-            <div>
+            <div className="text-center sm:text-left">
               <p
-                className="text-sm leading-tight mb-0.5"
+                className="text-xs sm:text-sm leading-tight mb-0.5"
                 style={{
                   fontFamily: 'var(--store-font-heading)',
                   fontWeight:
@@ -315,7 +373,7 @@ export const Benefits = () => {
               </p>
 
               <p
-                className="text-[11px] font-medium"
+                className="text-[10px] sm:text-[11px] font-medium"
                 style={{
                   fontFamily: 'var(--store-font-body)',
                   fontWeight:
@@ -364,23 +422,23 @@ export const EditorialSection = () => {
     return null;
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 py-12">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-[1400px] mx-auto px-3 md:px-6 py-8 md:py-12">
+      <div className="flex items-center justify-between mb-6 md:mb-8">
         <h2
-          className="flex items-center gap-3 text-xl font-bold uppercase tracking-wide"
+          className="flex items-center gap-2 md:gap-3 text-lg md:text-xl font-bold uppercase tracking-wide"
           style={{
             fontFamily: 'var(--store-font-heading)',
             fontWeight: 'var(--store-font-weight-title)',
             color: 'var(--store-foreground)'
           }}
         >
-          <span className="w-1.5 h-7 bg-[var(--price-color)] rounded-full inline-block" />
-          DESTAQUES DA COLEÇÃO
+          <span className="w-1 md:w-1.5 h-5 md:h-7 bg-[var(--price-color)] rounded-full inline-block" />
+          DESTAQUES
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-0 rounded-brand-card overflow-hidden shadow-xl border border-brand-border">
-        <div className="relative min-h-[400px] md:min-h-[500px] group overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-0 rounded-lg md:rounded-brand-card overflow-hidden shadow-lg md:shadow-xl border border-brand-border">
+        <div className="relative min-h-[280px] sm:min-h-[350px] md:min-h-[500px] group overflow-hidden">
           <img
             src={
               editorial.imagem_url ||
@@ -393,13 +451,13 @@ export const EditorialSection = () => {
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-          <div className="absolute bottom-10 left-10 right-10">
-            <p className="text-brand-secondary text-xs tracking-[0.3em] uppercase font-bold mb-3 drop-shadow-sm">
+          <div className="absolute bottom-6 sm:bottom-8 left-6 sm:left-8 md:bottom-10 md:left-10 right-6 sm:right-8 md:right-10">
+            <p className="text-brand-secondary text-[10px] sm:text-xs tracking-[0.2em] uppercase font-bold mb-2 md:mb-3 drop-shadow-sm">
               {editorial.subtitulo}
             </p>
 
             <h3
-              className="text-white text-5xl mb-4"
+              className="text-white text-2xl sm:text-3xl md:text-5xl mb-2 md:mb-4 leading-tight"
               style={{
                 fontFamily: 'var(--store-font-heading)',
                 fontWeight:
@@ -409,14 +467,14 @@ export const EditorialSection = () => {
               {editorial.titulo}
             </h3>
 
-            <p className="text-white/80 text-base mb-8 max-w-xs font-medium leading-relaxed">
+            <p className="text-white/80 text-xs sm:text-sm md:text-base mb-4 md:mb-8 max-w-xs font-medium leading-relaxed line-clamp-2 md:line-clamp-3">
               {editorial.descricao ||
                 'Peças que contam histórias. Descubra a elegância atemporal da nova coleção.'}
             </p>
 
             <Link
               to={editorial.link_botao || '/'}
-              className="border-2 border-[var(--store-button-text)] text-[var(--store-button-text)] text-xs font-bold px-8 py-3.5 hover:bg-[var(--store-button-text)] hover:text-black transition-all duration-300 rounded-brand-button"
+              className="border-2 border-[var(--store-button-text)] text-[var(--store-button-text)] text-[10px] sm:text-xs md:text-sm font-bold px-5 sm:px-6 md:px-8 py-2 md:py-3.5 hover:bg-[var(--store-button-text)] hover:text-black transition-all duration-300 rounded-lg md:rounded-brand-button inline-block"
               style={{
                 letterSpacing:
                   'var(--store-header-spacing)',
@@ -433,7 +491,7 @@ export const EditorialSection = () => {
           {displayProducts.map((p: any) => (
             <div
               key={p.id}
-              className="bg-brand-card p-2 md:p-4"
+              className="bg-brand-card p-1.5 sm:p-2 md:p-4"
             >
               <ProductCard product={p} />
             </div>
