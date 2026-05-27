@@ -412,16 +412,32 @@ const Integrations = () => {
                       const baseUrl = isSandbox ? 'https://sandbox.melhorenvio.com.br' : 'https://melhorenvio.com.br';
                       const redirectUri = encodeURIComponent(`${window.location.origin}/admin/integracoes/melhor-envio/callback`);
                       const scopes = encodeURIComponent([
-                        'shipping-calculate',
-                        'shipping-companies',
-                        'shipping-preview',
-                        'shipping-generate',
-                        'shipping-print',
-                        'shipping-tracking',
-                        'ecommerce-shipping',
+                        'cart-read',
+                        'cart-write',
+                        'companies-read',
+                        'companies-write',
+                        'coupons-read',
+                        'coupons-write',
+                        'notifications-read',
                         'orders-read',
                         'products-read',
-                        'users-read'
+                        'products-write',
+                        'purchases-read',
+                        'shipping-calculate',
+                        'shipping-cancel',
+                        'shipping-checkout',
+                        'shipping-companies',
+                        'shipping-generate',
+                        'shipping-preview',
+                        'shipping-print',
+                        'shipping-share',
+                        'shipping-tracking',
+                        'ecommerce-shipping',
+                        'transactions-read',
+                        'users-read',
+                        'users-write',
+                        'webhooks-read',
+                        'webhooks-write'
                       ].join(' '));
                       return `${baseUrl}/oauth/authorize?client_id=${config.client_id}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}&state=${isSandbox ? 'sandbox' : 'production'}`;
                     })()}
@@ -442,16 +458,32 @@ const Integrations = () => {
                   const baseUrl = isSandbox ? 'https://sandbox.melhorenvio.com.br' : 'https://melhorenvio.com.br';
                   const redirectUri = encodeURIComponent(`${window.location.origin}/admin/integracoes/melhor-envio/callback`);
                   const scopes = encodeURIComponent([
-                    'shipping-calculate',
-                    'shipping-companies',
-                    'shipping-preview',
-                    'shipping-generate',
-                    'shipping-print',
-                    'shipping-tracking',
-                    'ecommerce-shipping',
+                    'cart-read',
+                    'cart-write',
+                    'companies-read',
+                    'companies-write',
+                    'coupons-read',
+                    'coupons-write',
+                    'notifications-read',
                     'orders-read',
                     'products-read',
-                    'users-read'
+                    'products-write',
+                    'purchases-read',
+                    'shipping-calculate',
+                    'shipping-cancel',
+                    'shipping-checkout',
+                    'shipping-companies',
+                    'shipping-generate',
+                    'shipping-preview',
+                    'shipping-print',
+                    'shipping-share',
+                    'shipping-tracking',
+                    'ecommerce-shipping',
+                    'transactions-read',
+                    'users-read',
+                    'users-write',
+                    'webhooks-read',
+                    'webhooks-write'
                   ].join(' '));
                   const authUrl = `${baseUrl}/oauth/authorize?client_id=${config.client_id}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}&state=${isSandbox ? 'sandbox' : 'production'}`;
                   
