@@ -38,15 +38,18 @@ const MelhorEnvioCallback = () => {
         const redirectUri = `${window.location.origin}/admin/integracoes/melhor-envio/callback`;
 
         const { data, error } = await supabase.functions.invoke('melhor-envio', {
-          body: {
-            action: 'exchange-code',
-            code,
-            client_id: config.client_id,
-            client_secret: config.client_secret,
-            redirect_uri: redirectUri,
-            ambiente: state
-          }
-        });
+  body: {
+    action: 'exchange-code',
+    code,
+    client_id: config.client_id,
+    client_secret: config.client_secret,
+    redirect_uri: redirectUri,
+    ambiente: state
+  }
+});
+
+console.log('FUNCTION RESPONSE:', data);
+console.log('FUNCTION ERROR:', error);
 
         if (error) throw error;
 
