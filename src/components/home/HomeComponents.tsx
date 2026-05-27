@@ -50,9 +50,9 @@ export const HeroBanner = () => {
   }, [safeBanners.length]);
 
   return (
-    <section className="w-full bg-brand-background py-4 md:py-6">
+    <section className="w-full bg-brand-background py-3 md:py-6">
       <div className="max-w-[1600px] mx-auto px-3 md:px-6">
-        <div className="relative w-full h-[190px] sm:h-[260px] md:h-[380px] lg:h-[520px] xl:h-[560px] overflow-hidden group rounded-[22px] md:rounded-[28px] bg-brand-secondary shadow-[0_12px_40px_rgba(0,0,0,0.10)]">
+        <div className="relative w-full h-[260px] sm:h-[300px] md:h-[380px] lg:h-[520px] xl:h-[560px] overflow-hidden group rounded-[22px] md:rounded-[28px] bg-brand-secondary shadow-[0_12px_40px_rgba(0,0,0,0.10)]">
           {safeBanners.map((banner: any, index: number) => (
             <div
               key={banner.id || index}
@@ -91,7 +91,7 @@ export const HeroBanner = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" />
 
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full px-6 md:px-16 lg:px-24">
+                <div className="w-full px-5 md:px-16 lg:px-24">
                   <div
                     className={`max-w-xl animate-in fade-in slide-in-from-left-8 duration-1000 ${
                       banner.posicao_texto === 'centro'
@@ -103,7 +103,7 @@ export const HeroBanner = () => {
                   >
                     {(banner.titulo || banner.title) && (
                       <h1
-                        className="text-3xl sm:text-4xl md:text-6xl leading-tight drop-shadow-lg mb-3 md:mb-4 text-white"
+                        className="text-2xl sm:text-4xl md:text-6xl leading-tight drop-shadow-lg mb-2 md:mb-4 text-white"
                         style={{
                           fontFamily: 'var(--store-font-heading)',
                           fontWeight: 'var(--store-font-weight-title)',
@@ -117,7 +117,7 @@ export const HeroBanner = () => {
                     )}
 
                     {(banner.subtitulo || banner.subtitle) && (
-                      <p className="text-white text-sm sm:text-base md:text-xl mb-6 md:mb-8 font-medium max-w-lg drop-shadow-md">
+                      <p className="text-white text-xs sm:text-base md:text-xl mb-4 md:mb-8 font-medium max-w-lg drop-shadow-md">
                         {banner.subtitulo || banner.subtitle}
                       </p>
                     )}
@@ -132,7 +132,7 @@ export const HeroBanner = () => {
                           banner.button_link ||
                           '/'
                         }
-                        className="inline-block bg-brand-primary hover:opacity-95 text-brand-primary-foreground px-8 md:px-12 py-3 md:py-4 transition-all duration-300 rounded-brand-button shadow-2xl"
+                        className="inline-block bg-brand-primary hover:opacity-95 text-brand-primary-foreground px-6 md:px-12 py-2.5 md:py-4 transition-all duration-300 rounded-brand-button shadow-2xl text-xs md:text-sm"
                         style={{
                           backgroundColor: banner.cor_botao,
                           letterSpacing: 'var(--store-header-spacing)',
@@ -163,8 +163,8 @@ export const HeroBanner = () => {
                   onClick={() => setCurrentSlide(index)}
                   className={`h-1.5 transition-all rounded-full ${
                     index === currentSlide
-                      ? 'w-12 bg-white'
-                      : 'w-6 bg-white/45 hover:bg-white/70'
+                      ? 'w-10 md:w-12 bg-white'
+                      : 'w-5 md:w-6 bg-white/45 hover:bg-white/70'
                   }`}
                 />
               ))}
@@ -181,7 +181,7 @@ export const HeroBanner = () => {
                       safeBanners.length
                   )
                 }
-                className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full flex items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-xl z-10"
+                className="hidden md:flex absolute left-3 md:left-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-xl z-10"
               >
                 <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
               </button>
@@ -192,7 +192,7 @@ export const HeroBanner = () => {
                     (prev) => (prev + 1) % safeBanners.length
                   )
                 }
-                className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full flex items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-xl z-10"
+                className="hidden md:flex absolute right-3 md:right-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-xl z-10"
               >
                 <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
               </button>
@@ -212,24 +212,18 @@ export const CategoryCircleIcons = () => {
     : [];
 
   return (
-    <section className="w-full bg-brand-background py-6 md:py-10">
-      <div className="max-w-[1600px] mx-auto px-4 md:px-6">
-
-        <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-
+    <section className="w-full bg-brand-background py-4 md:py-10">
+      <div className="max-w-[1600px] mx-auto px-3 md:px-6">
+        <div className="flex md:flex-wrap md:justify-center gap-3 md:gap-6 overflow-x-auto md:overflow-visible no-scrollbar pb-3 md:pb-0 px-1">
           {safeCategories.map((item: any, i: number) => (
             <Link
               to={`/category/${item.slug}`}
               key={i}
-              className="group"
+              className="group shrink-0"
             >
-
-              <div className="bg-white rounded-[26px] p-4 md:p-5 border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-
+              <div className="w-[118px] md:w-auto bg-white rounded-[22px] md:rounded-[26px] p-3 md:p-5 border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div className="flex flex-col items-center">
-
-                  <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-[#f5f5f5] shadow-md ring-4 ring-white">
-
+                  <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden bg-[#f5f5f5] shadow-md ring-4 ring-white">
                     <img
                       src={
                         item.imagem_url ||
@@ -250,7 +244,7 @@ export const CategoryCircleIcons = () => {
                   </div>
 
                   <span
-                    className="mt-4 text-[13px] md:text-[14px] text-center leading-tight text-brand-foreground group-hover:text-black transition-colors duration-300"
+                    className="mt-3 md:mt-4 text-[12px] md:text-[14px] text-center leading-tight text-brand-foreground group-hover:text-black transition-colors duration-300"
                     style={{
                       fontFamily: 'var(--store-font-body)',
                       fontWeight: 600
@@ -258,13 +252,10 @@ export const CategoryCircleIcons = () => {
                   >
                     {item.nome || item.name}
                   </span>
-
                 </div>
               </div>
-
             </Link>
           ))}
-
         </div>
       </div>
     </section>
