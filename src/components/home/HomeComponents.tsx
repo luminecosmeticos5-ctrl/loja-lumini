@@ -215,7 +215,7 @@ export const CategoryCircleIcons = () => {
     <section className="w-full bg-brand-background py-6 md:py-10">
       <div className="max-w-[1600px] mx-auto px-4 md:px-6">
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-4 md:gap-6">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-6">
 
           {safeCategories.map((item: any, i: number) => (
             <Link
