@@ -91,7 +91,7 @@ export const HeroBanner = () => {
                     fallbackBanner.imagem_desktop
                   }
                   alt={banner.titulo || banner.title || 'Banner'}
-                  className="w-full h-full object-contain md:object-cover object-center bg-black"
+                  className="w-full h-full object-cover object-center"
                   loading={index === 0 ? 'eager' : 'lazy'}
                   onError={(e: any) => {
                     e.target.src = fallbackBanner.imagem_desktop;
