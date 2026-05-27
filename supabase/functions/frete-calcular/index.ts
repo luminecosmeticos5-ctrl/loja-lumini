@@ -188,7 +188,7 @@ serve(async (req) => {
     // 6. CHAMAR API DO MELHOR ENVIO
     // ============================================
     const melhorEnvioResponse = await fetch(
-      "https://melhorenvio.com.br/api/v2/me/shipment/calculate",
+      "https://www.melhorenvio.com.br/api/v2/me/shipment/calculate",
       {
         method: "POST",
         headers: {
