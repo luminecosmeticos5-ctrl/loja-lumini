@@ -51,7 +51,7 @@ export const HeroBanner = () => {
 
   return (
     <section className="w-full bg-brand-background py-4 md:py-6">
-      <div className="max-w-[1400px] mx-auto px-3 md:px-6">
+      <div className="max-w-[1600px] mx-auto px-3 md:px-6">
         <div className="relative w-full h-[190px] sm:h-[260px] md:h-[380px] lg:h-[460px] xl:h-[500px] overflow-hidden group rounded-[22px] md:rounded-[28px] bg-brand-secondary shadow-[0_12px_40px_rgba(0,0,0,0.10)]">
           {safeBanners.map((banner: any, index: number) => (
             <div
