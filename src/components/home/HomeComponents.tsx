@@ -50,147 +50,157 @@ export const HeroBanner = () => {
   }, [safeBanners.length]);
 
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden group bg-brand-secondary">
-      {safeBanners.map((banner: any, index: number) => (
-        <div
-          key={banner.id || index}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            index === currentSlide
-              ? 'opacity-100'
-              : 'opacity-0 pointer-events-none'
-          }`}
-        >
-          <picture className="w-full h-full">
-            <source
-              media="(max-width: 768px)"
-              srcSet={
-                banner.imagem_mobile ||
-                banner.imagem_desktop ||
-                banner.imagem
-              }
-            />
+    <section className="w-full bg-brand-background py-4 md:py-6">
+      <div className="max-w-[1400px] mx-auto px-3 md:px-6">
+        <div className="relative w-full h-[190px] sm:h-[260px] md:h-[380px] lg:h-[460px] xl:h-[500px] overflow-hidden group rounded-[22px] md:rounded-[28px] bg-brand-secondary shadow-[0_12px_40px_rgba(0,0,0,0.10)]">
+          {safeBanners.map((banner: any, index: number) => (
+            <div
+              key={banner.id || index}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === currentSlide
+                  ? 'opacity-100'
+                  : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <picture className="w-full h-full">
+                <source
+                  media="(max-width: 768px)"
+                  srcSet={
+                    banner.imagem_mobile ||
+                    banner.imagem_desktop ||
+                    banner.imagem
+                  }
+                />
 
-            <img
-              src={
-                banner.imagem_desktop ||
-                banner.imagem ||
-                banner.image ||
-                fallbackBanner.imagem_desktop
-              }
-              alt={banner.titulo || banner.title || 'Banner'}
-              className="w-full h-full object-cover object-center"
-              loading={index === 0 ? 'eager' : 'lazy'}
-              onError={(e: any) => {
-                e.target.src = fallbackBanner.imagem_desktop;
-              }}
-            />
-          </picture>
+                <img
+                  src={
+                    banner.imagem_desktop ||
+                    banner.imagem ||
+                    banner.image ||
+                    fallbackBanner.imagem_desktop
+                  }
+                  alt={banner.titulo || banner.title || 'Banner'}
+                  className="w-full h-full object-cover object-center"
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  onError={(e: any) => {
+                    e.target.src = fallbackBanner.imagem_desktop;
+                  }}
+                />
+              </picture>
 
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/10 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" />
 
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-[1400px] mx-auto w-full px-6 md:px-24">
-              <div
-                className={`max-w-xl animate-in fade-in slide-in-from-left-8 duration-1000 ${
-                  banner.posicao_texto === 'centro'
-                    ? 'mx-auto text-center items-center flex flex-col'
-                    : banner.posicao_texto === 'direita'
-                    ? 'ml-auto text-right items-end flex flex-col'
-                    : ''
-                }`}
-              >
-                {(banner.titulo || banner.title) && (
-                  <h1
-                    className="text-4xl md:text-7xl leading-tight drop-shadow-lg mb-4"
-                    style={{
-                      fontFamily: 'var(--store-font-heading)',
-                      fontWeight: 'var(--store-font-weight-title)',
-                      letterSpacing: 'var(--store-header-spacing)',
-                      textTransform:
-                        'var(--store-header-transform)' as any
-                    }}
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full px-6 md:px-16 lg:px-24">
+                  <div
+                    className={`max-w-xl animate-in fade-in slide-in-from-left-8 duration-1000 ${
+                      banner.posicao_texto === 'centro'
+                        ? 'mx-auto text-center items-center flex flex-col'
+                        : banner.posicao_texto === 'direita'
+                        ? 'ml-auto text-right items-end flex flex-col'
+                        : ''
+                    }`}
                   >
-                    {banner.titulo || banner.title}
-                  </h1>
-                )}
+                    {(banner.titulo || banner.title) && (
+                      <h1
+                        className="text-3xl sm:text-4xl md:text-6xl leading-tight drop-shadow-lg mb-3 md:mb-4 text-white"
+                        style={{
+                          fontFamily: 'var(--store-font-heading)',
+                          fontWeight: 'var(--store-font-weight-title)',
+                          letterSpacing: 'var(--store-header-spacing)',
+                          textTransform:
+                            'var(--store-header-transform)' as any
+                        }}
+                      >
+                        {banner.titulo || banner.title}
+                      </h1>
+                    )}
 
-                {(banner.subtitulo || banner.subtitle) && (
-                  <p className="text-white text-lg md:text-xl mb-10 font-medium max-w-lg drop-shadow-md">
-                    {banner.subtitulo || banner.subtitle}
-                  </p>
-                )}
+                    {(banner.subtitulo || banner.subtitle) && (
+                      <p className="text-white text-sm sm:text-base md:text-xl mb-6 md:mb-8 font-medium max-w-lg drop-shadow-md">
+                        {banner.subtitulo || banner.subtitle}
+                      </p>
+                    )}
 
-                {(banner.texto_botao ||
-                  banner.textoBotao ||
-                  banner.button_text) && (
-                  <Link
-                    to={
-                      banner.link_botao ||
-                      banner.linkBotao ||
-                      banner.button_link ||
-                      '/'
-                    }
-                    className="inline-block bg-brand-primary hover:opacity-95 text-brand-primary-foreground px-12 py-4 transition-all duration-300 rounded-brand-button shadow-2xl"
-                    style={{
-                      backgroundColor: banner.cor_botao,
-                      letterSpacing: 'var(--store-header-spacing)',
-                      fontFamily: 'var(--store-font-heading)',
-                      fontWeight:
-                        'var(--store-font-weight-title)',
-                      textTransform:
-                        'var(--store-header-transform)' as any
-                    }}
-                  >
-                    {banner.texto_botao ||
+                    {(banner.texto_botao ||
                       banner.textoBotao ||
-                      banner.button_text ||
-                      'EXPLORAR AGORA'}
-                  </Link>
-                )}
+                      banner.button_text) && (
+                      <Link
+                        to={
+                          banner.link_botao ||
+                          banner.linkBotao ||
+                          banner.button_link ||
+                          '/'
+                        }
+                        className="inline-block bg-brand-primary hover:opacity-95 text-brand-primary-foreground px-8 md:px-12 py-3 md:py-4 transition-all duration-300 rounded-brand-button shadow-2xl"
+                        style={{
+                          backgroundColor: banner.cor_botao,
+                          letterSpacing: 'var(--store-header-spacing)',
+                          fontFamily: 'var(--store-font-heading)',
+                          fontWeight:
+                            'var(--store-font-weight-title)',
+                          textTransform:
+                            'var(--store-header-transform)' as any
+                        }}
+                      >
+                        {banner.texto_botao ||
+                          banner.textoBotao ||
+                          banner.button_text ||
+                          'EXPLORAR AGORA'}
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
+
+          {safeBanners.length > 1 && (
+            <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {safeBanners.map((_: any, index: number) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`h-1.5 transition-all rounded-full ${
+                    index === currentSlide
+                      ? 'w-12 bg-white'
+                      : 'w-6 bg-white/45 hover:bg-white/70'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          {safeBanners.length > 1 && (
+            <>
+              <button
+                onClick={() =>
+                  setCurrentSlide(
+                    (prev) =>
+                      (prev - 1 + safeBanners.length) %
+                      safeBanners.length
+                  )
+                }
+                className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full flex items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-xl z-10"
+              >
+                <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
+              </button>
+
+              <button
+                onClick={() =>
+                  setCurrentSlide(
+                    (prev) => (prev + 1) % safeBanners.length
+                  )
+                }
+                className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-white text-black hover:bg-white/90 rounded-full flex items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-xl z-10"
+              >
+                <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+              </button>
+            </>
+          )}
         </div>
-      ))}
-
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4 z-10">
-        {safeBanners.map((_: any, index: number) => (
-          <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`h-1.5 transition-all rounded-full ${
-              index === currentSlide
-                ? 'w-12 bg-white'
-                : 'w-4 bg-white/40 hover:bg-white/60'
-            }`}
-          />
-        ))}
       </div>
-
-      <button
-        onClick={() =>
-          setCurrentSlide(
-            (prev) =>
-              (prev - 1 + safeBanners.length) %
-              safeBanners.length
-          )
-        }
-        className="absolute left-8 top-1/2 -translate-y-1/2 h-12 w-12 bg-white/10 hover:bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all opacity-0 group-hover:opacity-100 border border-white/20 z-10"
-      >
-        <ChevronLeft className="h-6 w-6" />
-      </button>
-
-      <button
-        onClick={() =>
-          setCurrentSlide(
-            (prev) => (prev + 1) % safeBanners.length
-          )
-        }
-        className="absolute right-8 top-1/2 -translate-y-1/2 h-12 w-12 bg-white/10 hover:bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all opacity-0 group-hover:opacity-100 border border-white/20 z-10"
-      >
-        <ChevronRight className="h-6 w-6" />
-      </button>
-    </div>
+    </section>
   );
 };
 
