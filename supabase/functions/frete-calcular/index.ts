@@ -8,108 +8,153 @@ const supabase = createClient(
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
-  // Handle CORS
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // Apenas POST
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ erro: "Method not allowed" }), {
       status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" }
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
     });
   }
 
   try {
     const { cep, carrinho_itens } = await req.json();
 
-    // Validar entrada
     if (!cep || !carrinho_itens || carrinho_itens.length === 0) {
       return new Response(
-        JSON.stringify({ erro: "CEP e carrinho são obrigatórios" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          erro: "CEP e carrinho são obrigatórios",
+        }),
+        {
+          status: 400,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        }
       );
     }
 
-    // Buscar dados dos produtos
+    const { data: meConfig, error: meConfigError } = await supabase
+      .from("integracoes")
+      .select("config")
+      .eq("chave", "melhorenvio")
+      .single();
+
+    if (meConfigError) {
+      return new Response(
+        JSON.stringify({
+          erro: "Erro ao buscar configuração do Melhor Envio",
+          detalhes: meConfigError.message,
+        }),
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    const melhorEnvioToken = meConfig?.config?.access_token;
+
+    if (!melhorEnvioToken) {
+      return new Response(
+        JSON.stringify({
+          erro: "Token Melhor Envio não encontrado no banco",
+        }),
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    const originCep =
+      meConfig?.config?.cep_origem ||
+      Deno.env.get("ORIGIN_CEP") ||
+      "01310-100";
+
     const produto_ids = carrinho_itens.map((item: any) => item.id);
+
     const { data: produtos, error: produtoError } = await supabase
       .from("produtos")
       .select("*")
       .in("id", produto_ids);
 
     if (produtoError) {
-      console.error("Erro ao buscar produtos:", produtoError);
       return new Response(
-        JSON.stringify({ erro: "Erro ao buscar produtos: " + produtoError.message, detalhes: produtoError }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          erro: "Erro ao buscar produtos",
+          detalhes: produtoError.message,
+        }),
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        }
       );
     }
 
-    // Calcular peso e dimensões totais
     let peso_total = 0;
     let altura_max = 0;
     let largura_max = 0;
     let comprimento_max = 0;
 
     for (const item of carrinho_itens) {
-      const produto = produtos.find((p: any) => p.id === item.id);
-      if (produto) {
-        // Tenta pegar das colunas diretas ou de dentro de detalhes
-        const peso = (produto.peso || produto.detalhes?.peso || 0.3);
-        const altura = (produto.altura || produto.detalhes?.altura || 4);
-        const largura = (produto.largura || produto.detalhes?.largura || 12);
-        const comprimento = (produto.comprimento || produto.detalhes?.comprimento || 17);
+      const produto = produtos?.find((p: any) => p.id === item.id);
 
-        peso_total += peso * item.quantidade;
+      if (produto) {
+        const peso = produto.peso || produto.detalhes?.peso || 0.3;
+        const altura = produto.altura || produto.detalhes?.altura || 4;
+        const largura = produto.largura || produto.detalhes?.largura || 12;
+        const comprimento =
+          produto.comprimento || produto.detalhes?.comprimento || 17;
+
+        peso_total += peso * (item.quantidade || 1);
         altura_max = Math.max(altura_max, altura);
         largura_max = Math.max(largura_max, largura);
         comprimento_max = Math.max(comprimento_max, comprimento);
       }
     }
 
-    // Chamar Melhor Envio
-    const melhorEnvioToken = Deno.env.get("MELHOR_ENVIO_TOKEN");
-    
-    if (!melhorEnvioToken) {
-      return new Response(
-        JSON.stringify({ erro: "Token Melhor Envio não configurado (Env)" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Buscar CEP de origem na configuração ou env
-    const { data: meConfig } = await supabase.from("integracoes").select("config").eq("chave", "melhorenvio").single();
-    const originCep = meConfig?.config?.cep_origem || Deno.env.get("ORIGIN_CEP");
-
-    if (!originCep) {
-      return new Response(
-        JSON.stringify({ erro: "CEP de origem não configurado. Verifique as configurações de integração ou a variável de ambiente ORIGIN_CEP." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     const payload = {
-      from: { postal_code: originCep.replace("-", "") }, // CEP de origem dinâmico
-      to: { postal_code: cep.replace("-", "") },
+      from: {
+        postal_code: String(originCep).replace(/\D/g, ""),
+      },
+      to: {
+        postal_code: String(cep).replace(/\D/g, ""),
+      },
       products: [
         {
           id: "prod-1",
-          width: largura_max || 10,
-          height: altura_max || 10,
-          length: comprimento_max || 10,
-          weight: peso_total || 0.5, // Peso em kg
-          quantity: 1
-        }
-      ]
+          width: largura_max || 12,
+          height: altura_max || 4,
+          length: comprimento_max || 17,
+          weight: peso_total || 0.3,
+          quantity: 1,
+        },
+      ],
     };
 
     console.log("TOKEN EXISTS:", !!melhorEnvioToken);
+    console.log("ORIGIN CEP:", originCep);
     console.log("PAYLOAD:", JSON.stringify(payload, null, 2));
 
     const melhorEnvioResponse = await fetch(
@@ -117,56 +162,79 @@ serve(async (req) => {
       {
         method: "POST",
         headers: {
-          "Accept": "application/json",
-          "Authorization": `Bearer ${melhorEnvioToken}`,
+          Accept: "application/json",
+          Authorization: `Bearer ${melhorEnvioToken}`,
           "Content-Type": "application/json",
-          "User-Agent": "ecommerce/1.0"
+          "User-Agent": "Loja Lumini",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       }
     );
 
-    console.log("ME RESPONSE STATUS:", melhorEnvioResponse.status);
     const responseText = await melhorEnvioResponse.text();
+
+    console.log("ME RESPONSE STATUS:", melhorEnvioResponse.status);
     console.log("ME RESPONSE TEXT:", responseText);
 
     if (!melhorEnvioResponse.ok) {
-      console.error(
-        "Erro Melhor Envio:",
-        melhorEnvioResponse.status,
-        responseText
-      );
       return new Response(
-        JSON.stringify({ erro: "Erro ao calcular frete no Melhor Envio", status_me: melhorEnvioResponse.status, debug: responseText }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          erro: "Erro ao calcular frete no Melhor Envio",
+          status_me: melhorEnvioResponse.status,
+          debug: responseText,
+        }),
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        }
       );
     }
 
     const fretesData = JSON.parse(responseText);
 
-    // Formatar resposta
-    // Note: Melhor Envio response is usually an array of options
-    const options = Array.isArray(fretesData) ? fretesData : (fretesData.shipping || []);
-    
+    const options = Array.isArray(fretesData)
+      ? fretesData
+      : fretesData.shipping || [];
+
     const opcoes = options
       .filter((frete: any) => !frete.error)
       .map((frete: any, index: number) => ({
-        id: index,
-        nome: frete.name,
-        preco: parseFloat(frete.price),
-        dias: frete.delivery_time
+        id: frete.id || index,
+        nome: frete.name || frete.company?.name || "Entrega",
+        preco: parseFloat(frete.price || frete.custom_price || 0),
+        dias: frete.delivery_time || frete.custom_delivery_time || 0,
       }));
 
-    return new Response(JSON.stringify({ sucesso: true, opcoes }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" }
-    });
-
-  } catch (error) {
-    console.error("Erro geral:", error);
     return new Response(
-      JSON.stringify({ erro: "Erro interno: " + error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({
+        sucesso: true,
+        opcoes,
+      }),
+      {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (error: any) {
+    console.error("Erro geral:", error);
+
+    return new Response(
+      JSON.stringify({
+        erro: "Erro interno: " + error.message,
+      }),
+      {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
     );
   }
 });
