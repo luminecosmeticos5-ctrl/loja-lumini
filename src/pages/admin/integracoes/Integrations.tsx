@@ -80,7 +80,6 @@ const Integrations = () => {
     }
   };
 
-
   const getConfig = (chave: string) => {
     const item = integrations.find(i => i.chave === chave);
     return item?.config || {};
@@ -127,7 +126,6 @@ const Integrations = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Mercado Pago */}
         <IntegrationCard 
           title="Mercado Pago" 
           icon={CreditCard} 
@@ -137,13 +135,13 @@ const Integrations = () => {
         >
           <div className="space-y-4">
             <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-               <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
-               <input 
-                 type="checkbox" 
-                 checked={integrations.find(i => i.chave === 'mercadopago')?.ativo || false} 
-                 onChange={() => toggleAtivo('mercadopago')}
-                 className="w-5 h-5"
-               />
+              <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
+              <input 
+                type="checkbox" 
+                checked={integrations.find(i => i.chave === 'mercadopago')?.ativo || false} 
+                onChange={() => toggleAtivo('mercadopago')}
+                className="w-5 h-5"
+              />
             </div>
             
             <div>
@@ -240,28 +238,58 @@ const Integrations = () => {
               onClick={async () => {
                 const config = getConfig('mercadopago');
                 const ambiente = config.ambiente || 'sandbox';
-                const token = ambiente === 'sandbox' ? config.accessTokenSandbox : config.accessTokenProducao;
-                
-                if (!token) {
-                  toast.error('Informe o Access Token para testar.');
+
+                const publicKey =
+                  ambiente === 'sandbox'
+                    ? config.publicKeySandbox
+                    : config.publicKeyProducao;
+
+                const accessToken =
+                  ambiente === 'sandbox'
+                    ? config.accessTokenSandbox
+                    : config.accessTokenProducao;
+
+                if (!publicKey) {
+                  toast.error('Informe a Public Key do Mercado Pago.');
                   return;
                 }
 
-                try {
-                  toast.loading('Testando conexão...', { id: 'test-mp' });
-                  const { data, error } = await supabase.functions.invoke('testar-conexao-mercadopago', {
-                    body: { accessToken: token, ambiente }
-                  });
-                  
-                  if (error) throw error;
-                  if (data.success) {
-                    toast.success('Conexão Mercado Pago OK!', { id: 'test-mp' });
-                  } else {
-                    toast.error('Erro na conexão: ' + data.error, { id: 'test-mp' });
-                  }
-                } catch (err: any) {
-                  toast.error('Falha ao testar: ' + err.message, { id: 'test-mp' });
+                if (!accessToken) {
+                  toast.error('Informe o Access Token do Mercado Pago.');
+                  return;
                 }
+
+                const publicKeyPrefixOk =
+                  ambiente === 'sandbox'
+                    ? String(publicKey).startsWith('TEST-')
+                    : String(publicKey).startsWith('APP_USR-');
+
+                const tokenPrefixOk =
+                  ambiente === 'sandbox'
+                    ? String(accessToken).startsWith('TEST-')
+                    : String(accessToken).startsWith('APP_USR-');
+
+                if (!publicKeyPrefixOk) {
+                  toast.error(
+                    ambiente === 'sandbox'
+                      ? 'Public Key Sandbox deve começar com TEST-.'
+                      : 'Public Key Produção deve começar com APP_USR-.'
+                  );
+                  return;
+                }
+
+                if (!tokenPrefixOk) {
+                  toast.error(
+                    ambiente === 'sandbox'
+                      ? 'Access Token Sandbox deve começar com TEST-.'
+                      : 'Access Token Produção deve começar com APP_USR-.'
+                  );
+                  return;
+                }
+
+                await handleSave('mercadopago');
+
+                toast.success('Mercado Pago configurado corretamente!');
               }}
               className="w-full py-2 border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2 mt-2"
             >
@@ -273,15 +301,13 @@ const Integrations = () => {
                 <strong>Webhook URL:</strong><br />
                 Copie e cole no painel do Mercado Pago:<br />
                 <code className="bg-white/50 px-1 py-0.5 rounded break-all select-all">
-                  https://{window.location.hostname.split('.')[0]}.supabase.co/functions/v1/webhook-mercadopago
+                  https://cxdkwurzwzojgoxmujtp.supabase.co/functions/v1/webhook-mercadopago
                 </code>
               </p>
             </div>
           </div>
         </IntegrationCard>
 
-
-        {/* Melhor Envio */}
         <IntegrationCard 
           title="Melhor Envio" 
           icon={Truck} 
@@ -291,13 +317,13 @@ const Integrations = () => {
         >
           <div className="space-y-4">
             <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-               <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
-               <input 
-                 type="checkbox" 
-                 checked={integrations.find(i => i.chave === 'melhorenvio')?.ativo || false} 
-                 onChange={() => toggleAtivo('melhorenvio')}
-                 className="w-5 h-5"
-               />
+              <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
+              <input 
+                type="checkbox" 
+                checked={integrations.find(i => i.chave === 'melhorenvio')?.ativo || false} 
+                onChange={() => toggleAtivo('melhorenvio')}
+                className="w-5 h-5"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -326,7 +352,6 @@ const Integrations = () => {
                 />
               </div>
             </div>
-
 
             <div className="p-4 border border-gray-100 bg-gray-50 rounded-lg space-y-3">
               <h4 className="text-xs font-bold text-gray-700 uppercase flex items-center gap-2">
@@ -364,7 +389,6 @@ const Integrations = () => {
               </p>
             </div>
 
-            {/* DEBUG TÉCNICO MELHOR ENVIO */}
             <div className="p-4 border border-gray-200 bg-gray-50 rounded-lg space-y-3">
               <h4 className="text-xs font-bold text-gray-700 uppercase flex items-center gap-2">
                 <Smartphone className="h-3 w-3" /> Debug Técnico do Token
@@ -397,7 +421,6 @@ const Integrations = () => {
               </div>
             </div>
 
-
             <div className="flex flex-col gap-2">
               <div className="p-3 bg-gray-50 border border-gray-100 rounded-lg space-y-2">
                 <label className="block text-[10px] font-bold text-gray-400 uppercase">URL OAuth (Debug)</label>
@@ -411,7 +434,6 @@ const Integrations = () => {
                       const isSandbox = config.ambiente === 'sandbox';
                       const baseUrl = isSandbox ? 'https://sandbox.melhorenvio.com.br' : 'https://melhorenvio.com.br';
                       const redirectUri = encodeURIComponent(`${window.location.origin}/admin/integracoes/melhor-envio/callback`);
-                      // Removido parâmetro scope por completo para evitar erros de escopos malformados
                       return `${baseUrl}/oauth/authorize?client_id=${config.client_id}&redirect_uri=${redirectUri}&response_type=code&state=${isSandbox ? 'sandbox' : 'production'}`;
                     })()}
                     className="flex-1 bg-white border border-gray-100 rounded px-2 py-1 text-[10px] text-gray-500 overflow-hidden text-ellipsis"
@@ -430,10 +452,8 @@ const Integrations = () => {
                   const isSandbox = config.ambiente === 'sandbox';
                   const baseUrl = isSandbox ? 'https://sandbox.melhorenvio.com.br' : 'https://melhorenvio.com.br';
                   const redirectUri = encodeURIComponent(`${window.location.origin}/admin/integracoes/melhor-envio/callback`);
-                  // Removido parâmetro scope por completo para evitar erros de escopos malformados
                   const authUrl = `${baseUrl}/oauth/authorize?client_id=${config.client_id}&redirect_uri=${redirectUri}&response_type=code&state=${isSandbox ? 'sandbox' : 'production'}`;
                   
-                  // Salvar configurações antes de redirecionar
                   handleSave('melhorenvio').then(() => {
                     window.location.href = authUrl;
                   });
@@ -605,7 +625,6 @@ const Integrations = () => {
                   </button>
                 </div>
 
-                {/* Painel de Debug Técnico Profissional */}
                 <div id="me-debug-panel" className="hidden mt-4 p-4 bg-gray-900 rounded-lg border border-gray-800 shadow-2xl overflow-hidden">
                   <div className="flex justify-between items-center mb-3 border-b border-gray-800 pb-2">
                     <span className="text-[10px] font-bold text-red-400 uppercase tracking-widest">Última Resposta Técnica</span>
@@ -658,8 +677,6 @@ const Integrations = () => {
           </div>
         </IntegrationCard>
 
-
-        {/* E-mail (Resend/SMTP) */}
         <IntegrationCard 
           title="E-mail Transacional" 
           icon={Mail} 
@@ -668,14 +685,14 @@ const Integrations = () => {
           onSave={() => handleSave('email')}
         >
           <div className="space-y-4">
-             <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-               <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
-               <input 
-                 type="checkbox" 
-                 checked={integrations.find(i => i.chave === 'email')?.ativo || false} 
-                 onChange={() => toggleAtivo('email')}
-                 className="w-5 h-5"
-               />
+            <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
+              <input 
+                type="checkbox" 
+                checked={integrations.find(i => i.chave === 'email')?.ativo || false} 
+                onChange={() => toggleAtivo('email')}
+                className="w-5 h-5"
+              />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Provedor</label>
@@ -709,7 +726,6 @@ const Integrations = () => {
           </div>
         </IntegrationCard>
 
-        {/* WhatsApp */}
         <IntegrationCard 
           title="WhatsApp (Z-API / Evolution)" 
           icon={Smartphone} 
@@ -718,14 +734,14 @@ const Integrations = () => {
           onSave={() => handleSave('whatsapp')}
         >
           <div className="space-y-4">
-             <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-               <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
-               <input 
-                 type="checkbox" 
-                 checked={integrations.find(i => i.chave === 'whatsapp')?.ativo || false} 
-                 onChange={() => toggleAtivo('whatsapp')}
-                 className="w-5 h-5"
-               />
+            <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
+              <input 
+                type="checkbox" 
+                checked={integrations.find(i => i.chave === 'whatsapp')?.ativo || false} 
+                onChange={() => toggleAtivo('whatsapp')}
+                className="w-5 h-5"
+              />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">API URL</label>
