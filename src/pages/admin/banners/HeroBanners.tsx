@@ -54,7 +54,23 @@ const HeroBanners = () => {
         .from('banners')
         .getPublicUrl(storagePath);
 
-      setEditingBanner({ ...editingBanner, [field]: publicUrl });
+      setEditingBanner((prev: any) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          [field]: publicUrl,
+          imagem_desktop:
+            field === 'imagem_desktop'
+              ? publicUrl
+              : prev.imagem_desktop || publicUrl,
+          imagem_mobile:
+            field === 'imagem_mobile'
+              ? publicUrl
+              : prev.imagem_mobile || publicUrl
+        };
+      });
+
       toast.success('Imagem carregada!');
     } catch (error: any) {
       toast.error('Erro no upload: ' + error.message);
@@ -67,24 +83,37 @@ const HeroBanners = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingBanner) return;
-    if (!editingBanner.imagem_desktop && !editingBanner.imagem_mobile) {
-      toast.error('É necessário pelo menos uma imagem (Desktop ou Mobile)');
+
+    const imagemDesktop = editingBanner.imagem_desktop || editingBanner.imagem_mobile || '';
+    const imagemMobile = editingBanner.imagem_mobile || editingBanner.imagem_desktop || '';
+
+    if (!imagemDesktop) {
+      toast.error('É necessário enviar pelo menos uma imagem para o banner.');
       return;
     }
 
     try {
       setLoading(true);
+
       const payload = {
         ...editingBanner,
-        ordem: editingBanner.ordem || banners.length + 1
+        imagem_desktop: imagemDesktop,
+        imagem_mobile: imagemMobile,
+        ordem: editingBanner.ordem || banners.length + 1,
+        ativo: editingBanner.ativo !== false
       };
-      
 
       let res;
+
       if (editingBanner.id) {
-        res = await supabase.from('banners_hero').update(payload as any).eq('id', editingBanner.id);
+        res = await supabase
+          .from('banners_hero')
+          .update(payload as any)
+          .eq('id', editingBanner.id);
       } else {
-        res = await supabase.from('banners_hero').insert([payload] as any);
+        res = await supabase
+          .from('banners_hero')
+          .insert([payload] as any);
       }
 
       if (res.error) throw res.error;
@@ -101,7 +130,7 @@ const HeroBanners = () => {
 
   const handleDelete = async (id: number, titulo?: string) => {
     if (!window.confirm(`Tem certeza que deseja excluir o banner ${titulo ? `"${titulo}"` : ''}?`)) return;
-    
+
     try {
       setLoading(true);
       const { error } = await supabase.from('banners_hero').delete().eq('id', id);
@@ -125,7 +154,7 @@ const HeroBanners = () => {
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{editingBanner.id ? 'Editar Slide' : 'Novo Slide'}</h1>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
-              Dica: Textos e botões são opcionais. Você pode usar apenas imagens.
+              Dica: se enviar apenas uma imagem, ela será usada automaticamente no Desktop e no Mobile.
             </p>
           </div>
         </div>
@@ -136,13 +165,13 @@ const HeroBanners = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-xs font-bold text-gray-500 uppercase">Imagem Desktop</label>
-                  <span className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">1920x700px (21:9)</span>
+                  <span className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">1920x700px</span>
                 </div>
                 <div className="p-3 bg-blue-50 border border-blue-100 rounded text-[10px] text-blue-700 leading-relaxed mb-3">
                   <strong>Comportamento:</strong> object-cover com crop lateral. <br/>
-                  <strong>Área Segura:</strong> Mantenha textos e rostos nos 1400px centrais.
+                  <strong>Área Segura:</strong> mantenha textos e rostos nos 1400px centrais.
                 </div>
-                <div 
+                <div
                   onClick={() => fileInputDesktopRef.current?.click()}
                   className="h-48 bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-brand-primary transition-all overflow-hidden relative group"
                 >
@@ -150,7 +179,7 @@ const HeroBanners = () => {
                     <>
                       <img src={editingBanner.imagem_desktop} className="w-full h-full object-cover" />
                       <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[72%] border-x border-white/30 border-dashed pointer-events-none">
-                        <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[8px] px-1 rounded">ÁREA SEGURA (1400px)</div>
+                        <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[8px] px-1 rounded">ÁREA SEGURA</div>
                       </div>
                     </>
                   ) : (
@@ -166,13 +195,13 @@ const HeroBanners = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-xs font-bold text-gray-500 uppercase">Imagem Mobile</label>
-                  <span className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">1080x1350px (4:5)</span>
+                  <span className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">1080x1350px</span>
                 </div>
                 <div className="p-3 bg-blue-50 border border-blue-100 rounded text-[10px] text-blue-700 leading-relaxed mb-3">
-                  <strong>Comportamento:</strong> Preenche a tela mobile (proporção vertical). <br/>
-                  <strong>Dica:</strong> Use imagens verticais para melhor aproveitamento.
+                  <strong>Comportamento:</strong> preenche a tela mobile. <br/>
+                  <strong>Dica:</strong> se não enviar, usaremos a imagem Desktop.
                 </div>
-                <div 
+                <div
                   onClick={() => fileInputMobileRef.current?.click()}
                   className="h-48 bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-brand-primary transition-all overflow-hidden"
                 >
@@ -188,56 +217,62 @@ const HeroBanners = () => {
                 <input type="file" ref={fileInputMobileRef} className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'imagem_mobile')} />
               </div>
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Título</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={editingBanner.titulo || ''}
-                onChange={e => setEditingBanner({...editingBanner, titulo: e.target.value})}
+                onChange={e => setEditingBanner({ ...editingBanner, titulo: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-2 text-sm"
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Subtítulo</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={editingBanner.subtitulo || ''}
-                onChange={e => setEditingBanner({...editingBanner, subtitulo: e.target.value})}
+                onChange={e => setEditingBanner({ ...editingBanner, subtitulo: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-2 text-sm"
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Texto do Botão</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={editingBanner.texto_botao || ''}
-                onChange={e => setEditingBanner({...editingBanner, texto_botao: e.target.value})}
+                onChange={e => setEditingBanner({ ...editingBanner, texto_botao: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-2 text-sm"
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Link do Botão</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={editingBanner.link_botao || ''}
-                onChange={e => setEditingBanner({...editingBanner, link_botao: e.target.value})}
+                onChange={e => setEditingBanner({ ...editingBanner, link_botao: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-2 text-sm"
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Cor do Botão</label>
-              <input 
-                type="color" 
+              <input
+                type="color"
                 value={editingBanner.cor_botao || '#8B3A6B'}
-                onChange={e => setEditingBanner({...editingBanner, cor_botao: e.target.value})}
+                onChange={e => setEditingBanner({ ...editingBanner, cor_botao: e.target.value })}
                 className="h-10 w-full cursor-pointer rounded border border-gray-100"
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Posição do Texto</label>
-              <select 
+              <select
                 value={editingBanner.posicao_texto || 'esquerda'}
-                onChange={e => setEditingBanner({...editingBanner, posicao_texto: e.target.value as any})}
+                onChange={e => setEditingBanner({ ...editingBanner, posicao_texto: e.target.value as any })}
                 className="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-2 text-sm"
               >
                 <option value="esquerda">Esquerda</option>
@@ -246,10 +281,14 @@ const HeroBanners = () => {
               </select>
             </div>
           </div>
+
           <div className="flex justify-end gap-4">
-            <button type="button" onClick={() => setEditingBanner(null)} className="px-6 py-2 border border-gray-200 rounded-lg text-sm font-bold">CANCELAR</button>
-            <button type="submit" className="bg-[#2D1B4E] text-white px-8 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
-              <Save className="h-4 w-4" /> SALVAR SLIDE
+            <button type="button" onClick={() => setEditingBanner(null)} className="px-6 py-2 border border-gray-200 rounded-lg text-sm font-bold">
+              CANCELAR
+            </button>
+            <button disabled={uploading || loading} type="submit" className="bg-[#2D1B4E] text-white px-8 py-2 rounded-lg text-sm font-bold flex items-center gap-2 disabled:opacity-60">
+              {uploading || loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              SALVAR SLIDE
             </button>
           </div>
         </form>
@@ -264,10 +303,9 @@ const HeroBanners = () => {
           <h1 className="text-2xl font-bold text-gray-800">Banner Hero (Carrossel)</h1>
           <p className="text-sm text-gray-500">Gerencie os slides principais da página inicial.</p>
         </div>
-        <button 
+        <button
           type="button"
           onClick={() => {
-            console.log("Clicou em Adicionar Slide");
             setEditingBanner({ ativo: true, ordem: banners.length + 1 });
           }}
           className="bg-[#2D1B4E] text-white px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-[#1a0f2e] transition-all shadow-sm"
@@ -278,7 +316,9 @@ const HeroBanners = () => {
 
       <div className="grid grid-cols-1 gap-4">
         {loading ? (
-          <div className="flex justify-center p-20"><Loader2 className="animate-spin text-[#2D1B4E]" /></div>
+          <div className="flex justify-center p-20">
+            <Loader2 className="animate-spin text-[#2D1B4E]" />
+          </div>
         ) : banners.length === 0 ? (
           <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm text-center text-gray-500">
             Nenhum banner cadastrado.
@@ -289,9 +329,9 @@ const HeroBanners = () => {
               <div className="cursor-grab p-1 text-gray-300">
                 <GripVertical className="h-5 w-5" />
               </div>
-              
+
               <div className="h-24 w-48 rounded-lg bg-gray-50 overflow-hidden shrink-0 border border-gray-100 shadow-inner">
-                <img src={banner.imagem_desktop} alt="" className="w-full h-full object-cover" />
+                <img src={banner.imagem_desktop || banner.imagem_mobile} alt="" className="w-full h-full object-cover" />
               </div>
 
               <div className="flex-1 space-y-1">
@@ -306,8 +346,12 @@ const HeroBanners = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <button onClick={() => setEditingBanner(banner)} className="p-2 text-gray-400 hover:text-[#2D1B4E] hover:bg-gray-100 rounded-lg transition-all"><Edit className="h-4 w-4" /></button>
-                <button onClick={() => handleDelete(banner.id, banner.titulo)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"><Trash2 className="h-4 w-4" /></button>
+                <button onClick={() => setEditingBanner(banner)} className="p-2 text-gray-400 hover:text-[#2D1B4E] hover:bg-gray-100 rounded-lg transition-all">
+                  <Edit className="h-4 w-4" />
+                </button>
+                <button onClick={() => handleDelete(banner.id, banner.titulo)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             </div>
           ))
