@@ -52,7 +52,7 @@ export const HeroBanner = () => {
   return (
     <section className="w-full bg-brand-background py-4 md:py-6">
       <div className="max-w-[1600px] mx-auto px-3 md:px-6">
-        <div className="relative w-full h-[190px] sm:h-[260px] md:h-[380px] lg:h-[460px] xl:h-[500px] overflow-hidden group rounded-[22px] md:rounded-[28px] bg-brand-secondary shadow-[0_12px_40px_rgba(0,0,0,0.10)]">
+        <div className="relative w-full h-[190px] sm:h-[260px] md:h-[380px] lg:h-[520px] xl:h-[560px] overflow-hidden group rounded-[22px] md:rounded-[28px] bg-brand-secondary shadow-[0_12px_40px_rgba(0,0,0,0.10)]">
           {safeBanners.map((banner: any, index: number) => (
             <div
               key={banner.id || index}
@@ -212,45 +212,62 @@ export const CategoryCircleIcons = () => {
     : [];
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 py-12 bg-brand-background">
-      <div className="flex gap-10 md:gap-12 overflow-x-auto no-scrollbar pb-6 md:justify-center">
-        {safeCategories.map((item: any, i: number) => (
-          <Link
-            to={`/category/${item.slug}`}
-            key={i}
-            className="flex flex-col items-center gap-3 shrink-0 cursor-pointer group"
-          >
-            <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-brand-secondary transition-all duration-300 shadow-sm bg-brand-secondary ring-offset-2 ring-brand-secondary/20">
-              <img
-                src={
-                  item.imagem_url ||
-                  item.imagem ||
-                  item.image ||
-                  'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=200&h=200&fit=crop'
-                }
-                alt={item.nome || item.name}
-                className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-                onError={(e: any) => {
-                  e.target.src =
-                    'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=200&h=200&fit=crop';
-                }}
-              />
-            </div>
+    <section className="w-full bg-brand-background py-6 md:py-10">
+      <div className="max-w-[1600px] mx-auto px-4 md:px-6">
 
-            <span
-              className="text-xs text-brand-foreground tracking-tight text-center transition-colors"
-              style={{
-                fontFamily: 'var(--store-font-body)',
-                fontWeight: 'var(--store-font-weight-text)'
-              }}
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-4 md:gap-6">
+
+          {safeCategories.map((item: any, i: number) => (
+            <Link
+              to={`/category/${item.slug}`}
+              key={i}
+              className="group"
             >
-              {item.nome || item.name}
-            </span>
-          </Link>
-        ))}
+
+              <div className="bg-white rounded-[26px] p-4 md:p-5 border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+
+                <div className="flex flex-col items-center">
+
+                  <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-[#f5f5f5] shadow-md ring-4 ring-white">
+
+                    <img
+                      src={
+                        item.imagem_url ||
+                        item.imagem ||
+                        item.image ||
+                        'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=200&h=200&fit=crop'
+                      }
+                      alt={item.nome || item.name}
+                      className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                      loading="lazy"
+                      onError={(e: any) => {
+                        e.target.src =
+                          'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=200&h=200&fit=crop';
+                      }}
+                    />
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+                  </div>
+
+                  <span
+                    className="mt-4 text-[13px] md:text-[14px] text-center leading-tight text-brand-foreground group-hover:text-black transition-colors duration-300"
+                    style={{
+                      fontFamily: 'var(--store-font-body)',
+                      fontWeight: 600
+                    }}
+                  >
+                    {item.nome || item.name}
+                  </span>
+
+                </div>
+              </div>
+
+            </Link>
+          ))}
+
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 
